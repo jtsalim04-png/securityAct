@@ -4,18 +4,28 @@ security:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        # used to reload user from session & other features (e.g. switch_user)
-        app_user_provider:
-            entity:
-                class: App\Entity\User
-                property: email
+        in-memory:
+            memory:
+                users:
+                    admin:
+                        password: '$2y$13$eLSUX8SbcuJNmlE.Gtq6ZeJ3w4/viuCcOwsxamwhIb39WHIK2uRhC' # pw is 'admintest'
+                        roles: ['ROLE_ADMIN']
+                    user:
+                        password: '$2y$13$r25K7T64q7DRW1y87G85KuaVRIw8wslGWSSvrnRmn97iGui1lDHn2' # pw is 'usertest'
+                        roles: ['ROLE_USER']
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
             lazy: true
-            provider: app_user_provider
+            http_basic: ~
+            provider: in-memory
+
+        # logout:
+        #     path: app_logout
+        #     target: /
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -28,7 +38,7 @@ security:
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
-        - { path: ^/dashboard, roles: ROLE_USER }
+        - { path: ^/dashboard, roles: [ROLE_USER, ROLE_ADMIN] }
 
 when@test:
     security:
